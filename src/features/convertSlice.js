@@ -18,10 +18,10 @@ export const convertSlice = createSlice({
         I: 1,
       };  
 
-      const repetRomans = ['', 0]
-      let arr = action.payload.split("");
+      const repetRomans = [0, 0]
+      let arr = action.payload.toUpperCase().split("");
       let total = 0;
-      let current, currentValue, next, nextValue;
+      let current, currentValue, next, nextValue, err;
 
       for (let i = 0; i < arr.length; i++) {
 
@@ -33,23 +33,32 @@ export const convertSlice = createSlice({
         if(
           currentValue + nextValue === 10 
           || (current === 'V' && currentValue < nextValue)
-          ) return new Error("Invalid Roman Numeral");
+          ) { 
+            err = true;
+            break;
+          }
     
         if (repetRomans[0] === current) repetRomans[1] += 1;
-        else {
+
+        if (repetRomans[1] >= 3) {
+          err = true;
+          break;
+        }
+        
+        if (repetRomans[0] !== current) {
           repetRomans[0] = current;
           repetRomans[1] = 0;
         }
-        if (repetRomans[1] >= 4) return new Error("Invalid Roman Numeral");
 
-        
+        console.log(repetRomans)
+
         if (currentValue < nextValue) {
           total -= currentValue;
         } else {
           total += currentValue;
         }
       } 
-      state.value = total;
+      state.value = err ? '' : total;
     },
     decimalToRoman: (state, action) => {
       let
@@ -58,7 +67,9 @@ export const convertSlice = createSlice({
       res = [],
       num, letra, val, pos, insert
   
-    for(let i = 6; num = values[i], letra = letras[i]; i--) {
+    for(let i = 6; ; i--) {
+      num = values[i]
+      letra = letras[i]
       // Suficientemente grande
       if(action.payload >= num) {
         // Número de letras repetidas
